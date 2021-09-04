@@ -3,18 +3,19 @@
 <head>
     <meta charset="utf-8" />
     <meta name="referrer" content="no-referrer" />
-
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <title>ScreenEx</title>
     <script src="js/vue.js"></script>
     <script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="css/plug.css">
 
 </head>
 <html>
 
 <body>
     <div id="app" class="page">
-        <div id="clock-widget" class="card" style="grid-area: tm;">
+        <div id="clock-widget" class="card" style="">
             <h1 onclick="location.reload()" style="text-align: center;position: relative;">{{hello}}，{{name}}</h1>
             <h1 style="font-size: 190px;margin:10px;text-align: center;position: relative;top: -50px;">{{time}}
             </h1>
@@ -22,15 +23,16 @@
             <h1 style="font-size: 30px;margin: 0 0 0 30px;position: relative; top: -70px;">{{date}}</h1>
         </div>
 
-        <div id="Weather-widget" class="card" style="grid-area: we;">
+        <div id="Weather-widget" class="card" style="">
             <div id="he-plugin-standard"></div>
 
         </div>
 
-        <div id="phone-widget" class="card" style="grid-area: in;">
+        <div id="phone-widget" class="card" style="padding: 10px;height: 160px;">
             <div style="margin: 10px;">
-                <h3>IP: {{ip}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Battery: {{PhoneInfo.level}} %</h3>
-                <h2>距离 {{cd.name}} 还有 {{cd.left}} 天</h2>
+                <h3>IP: {{ip}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Battery: {{PhoneInfo.ischarging}}{{PhoneInfo.level}} %</h3>
+                <!-- <h2><i class="fa fa-calendar-check-o"></i> 距离 {{cd.name}} 还有 {{cd.left}} 天</h2> -->
+                <h3 style="white-space: pre-wrap;"><i class="fa fa-calendar-check-o"></i> {{deadline}}</h3>
                 <!-- <h3>RAM: {{PhoneInfo.freemem}}/{{PhoneInfo.totalmem}} G</h3> -->
 
             </div>
@@ -39,20 +41,20 @@
 
         </div>
 
-        <div id="todo-widget" class="card" style="grid-area: cl;">
-            <div style="margin: 20px;">
+        <div id="todo-widget" class="card" style="">
+            <div style="margin-left: 15px;margin: top 5px;">
                 <h3>{{content}}</h3>
             </div>
 
         </div>
 
-        <div id="yiyan-widget" class="card" style="grid-area: sa;text-align: right">
+        <div id="yiyan-widget" class="card" style="text-align: right">
             <div style="margin: 20px;">
                 <h3 @click="getyiyan">{{content}}</h3>
             </div>
         </div>
 
-        <div id="mybili-widget" class="card" style="grid-area: bi; padding: 20px;">
+        <div id="mybili-widget" class="card" style="padding: 20px;">
             <div id="face" style="height: 50px;width: 50px;float: left;">
                 <img class="headimg" :src="card.card.face">
                 <img src="pic/official1.png"
@@ -61,12 +63,12 @@
             <div style="line-height: 5px;padding-left: 80px;">
                 <p style="font-weight: bold; font-size: large;">{{card.card.name}}
                     [lv {{card.card.level_info.current_level}}]</p>
-                <p style="font-size: 6px;">认证: {{card.card.Official.title}}</p>
+                <p style="font-size: 6px; ">认证: {{card.card.Official.title}}<br><br><br><br><br>{{card.card.sign}}</p>
                 </p>
-                <p style="font-size: 5px;">{{card.card.sign}}</p>
+                <!-- <p style="font-size: 5px;">{{card.card.sign}}</p> -->
             </div>
             <div>
-                <table border=2px>
+                <table border=1px>
                     <tr>
                         <th>粉丝</th>
                         <th>投稿</th>
@@ -87,6 +89,13 @@
             </div>
 
         </div>
+
+        <div id="school-widget" class="card" style="padding-left:10px;">
+            <p style="font-weight: bold;"><i class="fa fa-building"></i> 宿舍信息</p>
+            <p>&emsp;{{dormitory.area}}<br>&emsp;{{dormitory.power}}度<br></p>
+            <p style="font-weight: bold;"><i class="fa fa-credit-card"></i> 校园卡</p>
+            <P>&emsp;当前余额：{{money.current/100}}&emsp;过渡余额：{{money.trans/100}}</P>
+        </div>
     </div>
 
 
@@ -95,17 +104,7 @@
         //缩放设置
         document.getElementsByTagName('body')[0].style.zoom = 0.75;
         //天气小部件设置
-        WIDGET = {
-            "CONFIG": {
-                "layout": "1",
-                "width": "380",
-                "height": "170",
-                "background": "5",
-                "dataColor": "FFFFFF",
-                "borderRadius": "20",
-                "key": "f301684a0f0d4713ab5c05041b767f5d"
-            }
-        }
+
     </script>
 
     <script src="https://widget.qweather.net/standard/static/js/he-standard-common.js?v=2.0"></script>
@@ -114,9 +113,9 @@
 
 </body>
 
+
 <style>
     * {
-        moz-user-select: -moz-none;
         -moz-user-select: none;
         -o-user-select: none;
         -khtml-user-select: none;
@@ -128,6 +127,7 @@
     table {
         border-color: transparent;
         text-align: center;
+        width: 100%;
     }
 
     .headimg {
@@ -135,13 +135,11 @@
         border-radius: 30px;
         position: absolute;
         margin-top: 10px;
-
     }
 
     body {
-        margin-top: 15px;
-        background-image: url("bg.png");
-        background-size: cover;
+        background-image: url("bg1.png");
+        background-size: contain;
         background-repeat: no-repeat;
         background-attachment: fixed;
     }
@@ -153,27 +151,20 @@
         border-radius: 20px;
         color: white;
         margin: 5px;
+        overflow: auto;
 
     }
-
 
     #app {
-        grid-template-areas:
-            "tm tm tm tm tm tm we we we we"
-            "tm tm tm tm tm tm we we we we"
-            "tm tm tm tm tm tm in in in in"
-            "tm tm tm tm tm tm in in in in"
-            "cl cl cl sa sa sa sa sa sa sa"
-            "bi bi bi bi bi ka ka ka ka ka";
-    }
-
-    .page {
         display: grid;
-        /* grid-template-columns: repeat(10, 10%); */
-        grid-template-rows: repeat(5, 20%);
-
+        grid-template-columns: repeat(10, 1fr);
+        grid-template-rows: repeat(10, 1fr);
+        grid-column-gap: 0px;
+        grid-row-gap: 0px;
     }
 </style>
+
+
 <script src="js/main.js"></script>
 
 </html>

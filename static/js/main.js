@@ -1,72 +1,37 @@
-const resdata = {
-    "code": 0,
-    "message": "0",
-    "ttl": 1,
-    "data": {
-        "card": {
-            "mid": "2",
-            "name": "未登录",
-            "sex": "保密",
-            "rank": "0",
-            "face": "http://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg",
-            "fans": 0,
-            "friend": 0,
-            "attention": 0,
-            "sign": "个性签名",
-            "level_info": {
-                "current_level": 6,
-                "current_min": 0,
-                "current_exp": 0,
-                "next_exp": 0
-            },
-            "nameplate": {
-                "nid": 10,
-                "name": "见习偶像",
-                "image": "http://i0.hdslb.com/bfs/face/e93dd9edfa7b9e18bf46fd8d71862327a2350923.png",
-                "image_small": "http://i1.hdslb.com/bfs/face/275b468b043ec246737ab8580a2075bee0b1263b.png",
-                "level": "普通勋章",
-                "condition": "所有自制视频总播放数\u003e=10万"
-            },
-            "Official": {
-                "role": 2,
-                "title": "认证信息",
-                "type": 0
-            },
-            "vip": {
-                "vipType": 2,
-                "vipStatus": 1,
-            }
+const UserConfig = {
+    name: '',
+    location: '',
+    deadlines: [
+        {
+            name: '上网课',
+            target: "2021-9-6"
         },
-        "space": {
-            "s_img": "http://i2.hdslb.com/bfs/space/768cc4fd97618cf589d23c2711a1d1a729f42235.png",
-            "l_img": "http://i2.hdslb.com/bfs/space/cb1c3ef50e22b6096fde67febe863494caefebad.png"
-        },
-        "archive_count": 0,
-        "follower": 0
+        {
+            name: '开学',
+            target: "2021-9-18"
+        }
+    ],
+    bilimid: 0
+}
+
+WIDGET = {
+    "CONFIG": {
+        "layout": "1",
+        "width": "380",
+        "height": "170",
+        "background": "5",
+        "dataColor": "FFFFFF",
+        "borderRadius": "20",
+        "city": UserConfig.location,
+        "key": "f301684a0f0d4713ab5c05041b767f5d"
     }
 }
-detail = {
-    "code": 0,
-    "message": "0",
-    "ttl": 1,
-    "data": {
-    "archive": {
-    "view": 17040
-    },
-    "article": {
-    "view": 2
-    },
-    "likes": 339
-    }
-    }
-viewdata = resdata.data;
 
-const appdata = {
-    saying: "",
-    hello: "",
-    name: "SwetyCore",
-    myinfo: viewdata,
-    upstate: detail.data
+function getleft(target) {
+    var date = Date.parse(new Date(target))
+    var now = Date.now()
+    left = Math.round((date - now) / 1000 / 60 / 60 / 24)
+    return left
 }
 
 
@@ -76,7 +41,7 @@ const clockWidget = new Vue({
         date: '',
         time: '',
         hello: "",
-        name: "SwetyCore"
+        name: UserConfig.name
     },
     mounted() {
         this.getdate();
@@ -142,6 +107,7 @@ const phoneWidget = new Vue({
         PhoneInfo: {
             totalmem: 0,
             freemem: 0,
+            ischarging: '',
             level: 0,
         },
         cd: {
@@ -150,7 +116,8 @@ const phoneWidget = new Vue({
             target: "2021-9-6"
         },
         todo: "假期中，暂无课程",
-        ip: "127.0.0.1"
+        ip: "127.0.0.1",
+        deadline: '倒计时\n'
 
     },
     mounted() {
@@ -160,7 +127,7 @@ const phoneWidget = new Vue({
         this.timer = setInterval(() => {
             this.updatebattery();
             this.updatecd();
-        }, 60000)
+        }, 2000)
     },
     methods: {
         updateip() {
@@ -176,16 +143,25 @@ const phoneWidget = new Vue({
             $.get({
                 url: "/getbattery",
                 success: function (data) {
-                    console.log(data)
+                    console.log(data.USBpowered)
+                    if (data.USBpowered == 'true') {
+                        data.ischarging = '⚡'
+                        console.log('cging')
+                    }
                     phoneWidget.PhoneInfo = data
                 }
             })
         },
         updatecd() {
-            var date = Date.parse(new Date(this.cd.target))
-            var now = Date.now()
-            left = Math.round((date - now) / 1000 / 60 / 60 / 24)
-            this.cd.left = left
+            title = '倒计时\n\t'
+            for (var i = 0; i < UserConfig.deadlines.length; i++) {
+                var member = UserConfig.deadlines[i]
+                var left = getleft(member.target)
+                // console.log(i, deadlines[i])
+                title = `${title} 距离 ${member.name} 还有 ${left} 天\n\t`
+            }
+            console.log(title)
+            this.deadline = title
         }
     }
 })
@@ -218,26 +194,59 @@ const yiyanWidget = new Vue({
 const todoWidget = new Vue({
     el: '#todo-widget',
     data: {
-        content: "假期中，暂无课程"
+        content: "假期中，暂无课程",
+        courses:[],
+        co:0
     },
     mounted() {
-
+        this.updatecourse()
+        this.timer = setInterval(() => {
+            this.updatecourse
+        }, 1000 * 60 * 60)
+        this.timer2 = setInterval(() => {
+            this.updatecontent()
+        }, 3000)
     },
     methods: {
-
+        updatecourse: function () {
+            $.get({
+                url: "/getcourse",
+                success: function (data) {
+                    todoWidget.courses=data.data
+                }
+            })
+        },
+        updatecontent:function(){
+            course_count=this.courses.length
+            if(course_count==0){
+                this.content='今日暂无课程'
+            }
+            else{
+                course=this.courses[this.co]
+                let date=new Date();
+                // if (date.getHours()<12){
+                    this.content=`第 ${course.sections}节在${course.position}上${course.name}`
+                // }
+            }
+            if(course_count-1>this.co){
+                this.co+=1
+            }else{
+                this.co=0
+            }
+        }
     }
 })
 
 const mybiliWidget = new Vue({
     el: '#mybili-widget',
     data: {
-        card:resdata.data,
-        upstate:detail.data
+        card: {},
+        upstate: {}
     },
     mounted() {
         $.get({
             url: "/getbilistate",
-            data: { mid: 156785512 },
+            data: { mid: UserConfig.bilimid },
             success: function (resdata) {
                 mybiliWidget.card = resdata
             }
@@ -245,11 +254,11 @@ const mybiliWidget = new Vue({
 
         $.get({
             url: "/getupstate",
-            data: { mid: 156785512 },
+            data: { mid: UserConfig.bilimid },
             success: function (resdata) {
-                if (!resdata.hasOwnProperty('article')){
+                if (!resdata.hasOwnProperty('article')) {
                     alert("未登录无法获取详细播放数据，将前往登录页面")
-                    window.location='biliLogin.html'
+                    window.location = 'biliLogin.html'
                 }
                 mybiliWidget.upstate = resdata
             }
@@ -258,7 +267,7 @@ const mybiliWidget = new Vue({
         this.timer = setInterval(() => {
             $.get({
                 url: "/getbilistate",
-                data: { mid: 156785512 },
+                data: { mid: UserConfig.bilimid },
                 success: function (resdata) {
                     mybiliWidget.card = resdata
                 }
@@ -266,7 +275,7 @@ const mybiliWidget = new Vue({
 
             $.get({
                 url: "/getupstate",
-                data: { mid: 156785512 },
+                data: { mid: UserConfig.bilimid },
                 success: function (resdata) {
                     mybiliWidget.upstate = resdata
                 }
@@ -275,39 +284,40 @@ const mybiliWidget = new Vue({
         }, 60000)
     }
 })
-const myhome = new Vue({
-    data() {
-        return appdata
+
+const schoolWidget = new Vue({
+    el: '#school-widget',
+    data: {
+        dormitory: {
+            area: '未知地区',
+            power: 0
+        },
+        money: {
+            current: 0,
+            trans: 0
+        }
     },
     mounted() {
+        this.update()
+        this.timer = setInterval(() => {
+            this.update()
+        }, 1000 * 60 * 60)
     },
     methods: {
-
-
-        getbiliinfo() {
+        update: function () {
             $.get({
-                url: "/getbiliinfo",
-                data: { mid: 156785512 },
-                // myinfo: viewdata,
-                // upstate:detail.data
+                url: "/getDormitoryPower",
                 success: function (resdata) {
-                    myhome.myinfo = resdata.data;
+                    schoolWidget.dormitory = resdata
                 }
             })
-        },
-        getbilistate() {
+
             $.get({
-                url: "/getbilistate",
-                data: { mid: 156785512 },
-                // myinfo: viewdata,
-                // upstate:detail.data
+                url: "/getCardMoney",
                 success: function (resdata) {
-                    myhome.upstate = resdata.data;
+                    schoolWidget.money = resdata
                 }
             })
         }
-
     }
 })
-
-// myhome.$mount("#app")

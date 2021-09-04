@@ -1,8 +1,9 @@
 #!/bin/python3
 
 from flask import Flask,Response,redirect,request
-from pluglings import *
-
+from pluglings.pluglings import *
+from pluglings.course import getCourse
+# from coursetest import getCourse
 app=Flask(__name__)
 
 def responseJson(content):
@@ -42,6 +43,17 @@ def rgetupstate():
     key=request.args.get('mid')
     return responseJson(getupstate(key))
 
+@app.get('/getDormitoryPower')
+def rgetDormitoryPower():
+    return responseJson(getDormitoryPower())
+
+@app.get('/getCardMoney')
+def rgetCardMoney():
+    return responseJson(getCardMoney())
+
+@app.get('/getcourse')
+def rgetCourse():
+    return responseJson(getCourse())
 
 if __name__=='__main__':
     app.run(host="0.0.0.0")

@@ -1,0 +1,10 @@
+#clock-widget { grid-area: 1 / 1 / 5 / 7; }
+#Weather-widget { grid-area: 1 / 7 / 3 / 11; }
+#phone-widget { grid-area: 3 / 7 / 5 / 11; }
+#todo-widget { grid-area: 5 / 1 / 6 / 5; }
+#yiyan-widget { grid-area: 5 / 5 / 6 / 11; }
+#mybili-widget { grid-area: 6 / 1 / 8 / 5; }
+#school-widget { grid-area: 6 / 5 / 9 / 9; }
+
+
+
