@@ -3,12 +3,12 @@ const UserConfig = {
     location: '',
     deadlines: [
         {
-            name: '上网课',
-            target: "2021-9-6"
+            name: '开裆时间',
+            target: "2022-6-5"
         },
         {
-            name: '开学',
-            target: "2021-9-18"
+            name: '距离平均寿命',
+            target: "2022-6-20"
         }
     ],
     bilimid: 0
